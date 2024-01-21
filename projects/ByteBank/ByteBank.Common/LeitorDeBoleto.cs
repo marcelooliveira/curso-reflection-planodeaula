@@ -1,15 +1,15 @@
 ﻿using System.Globalization;
 using System.Reflection;
 
-namespace ByteBank.ConsoleApp
+namespace ByteBank.Common
 {
-    public class LeitorDeBoleto<T>
+    public class LeitorDeBoleto<Boleto>
     {
-        public List<T> ReadCsv(string filePath)
+        public List<Boleto> ReadCsv(string filePath)
         {
             try
             {
-                List<T> records = new List<T>();
+                List<Boleto> records = new List<Boleto>();
 
                 using (var reader = new StreamReader(filePath))
                 {
@@ -21,7 +21,7 @@ namespace ByteBank.ConsoleApp
 
                         if (data != null && header != null && data.Length == header.Length)
                         {
-                            T record = MapToType(data, header);
+                            Boleto record = MapToType(data, header);
                             records.Add(record);
                         }
                     }
@@ -32,14 +32,14 @@ namespace ByteBank.ConsoleApp
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao ler o arquivo CSV: {ex.Message}");
-                return new List<T>();
+                return new List<Boleto>();
             }
         }
 
-        private T MapToType(string[] data, string[] header)
+        private Boleto MapToType(string[] data, string[] header)
         {
-            Type type = typeof(T);
-            T instance = Activator.CreateInstance<T>();
+            Type type = typeof(Boleto);
+            Boleto instance = Activator.CreateInstance<Boleto>();
 
             for (int i = 0; i < header.Length; i++)
             {

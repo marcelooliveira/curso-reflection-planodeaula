@@ -1,6 +1,6 @@
 ﻿using ByteBank.Common;
-using ByteBank.ConsoleApp;
 using ByteBank.Library;
+using System.Reflection;
 
 MostrarBanner();
 
@@ -39,6 +39,7 @@ static void MostrarMenu()
     Console.WriteLine();
     Console.WriteLine("1. Ler arquivo de boletos");
     Console.WriteLine("2. Gravar arquivo com totais de boletos");
+    Console.WriteLine("3. Executar Plugins");
     Console.WriteLine();
     Console.Write("Digite o número da opção desejada: ");
 }
@@ -52,6 +53,9 @@ static void ExecutarEscolha(int escolha)
             break;
         case 2:
             GravarGrupoBoletos();
+            break;
+        case 3:
+            ExecutarPlugins();
             break;
 
         default:
@@ -83,4 +87,71 @@ static void GravarGrupoBoletos()
     List<Boleto> boletos = leitorDeCSV.ReadCsv("Boletos.csv");
     RelatorioDeBoleto gravadorDeCSV = new RelatorioDeBoleto();
     gravadorDeCSV.SalvarBoletosPorCedente(boletos);
+}
+
+static void ExecutarPlugins()
+{
+    Console.WriteLine("Gravando arquivo de boletos...");
+
+    LeitorDeBoleto<Boleto> leitorDeCSV = new LeitorDeBoleto<Boleto>();
+    List<Boleto> boletos = leitorDeCSV.ReadCsv("Boletos.csv");
+
+    const string pastaPlugins = "Plugins";
+    List<Type> classesDePlugin = ObterClassesDePlugin<IRelatorioDeBoleto<Boleto>>(pastaPlugins);
+
+    Console.WriteLine("Identificando plugins...");
+
+    foreach (var classe in classesDePlugin)
+    {
+        Console.WriteLine($"Plugin identificado: {classe}");
+        // Criar uma instância do tipo encontrado
+        var instancia = Activator.CreateInstance(classe);
+
+        // Verificar se a instância implementa a interface
+        if (instancia is IRelatorioDeBoleto<Boleto> relatorio)
+        {
+            // Chamar o método SalvarBoletosPorCedente usando Reflection
+            MethodInfo metodoSalvar = classe.GetMethod("SalvarBoletosPorCedente");
+            metodoSalvar.Invoke(relatorio, new object[] { boletos });
+
+            Console.WriteLine($"Método SalvarBoletosPorCedente chamado para o tipo {classe.FullName}");
+        }
+    }
+}
+
+static List<Type> ObterClassesDePlugin<T>(string pasta)
+{
+    List<Type> tiposEncontrados = new List<Type>();
+
+    // Verificar se o diretório existe
+    if (Directory.Exists(pasta))
+    {
+        // Obter todos os arquivos .dll na pasta
+        string[] arquivosDll = Directory.GetFiles(pasta, "*.dll");
+
+        foreach (var arquivoDll in arquivosDll)
+        {
+            try
+            {
+                // Carregar o assembly
+                Assembly assembly = Assembly.LoadFrom(arquivoDll);
+
+                // Encontrar tipos que implementam a interface T
+                IEnumerable<Type> tiposImplementandoT = assembly.GetTypes()
+                    .Where(t => typeof(T).IsAssignableFrom(t) && t.IsClass && !t.IsAbstract);
+
+                tiposEncontrados.AddRange(tiposImplementandoT);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao carregar o assembly {arquivoDll}: {ex.Message}");
+            }
+        }
+    }
+    else
+    {
+        Console.WriteLine($"O diretório '{pasta}' não existe.");
+    }
+
+    return tiposEncontrados;
 }
