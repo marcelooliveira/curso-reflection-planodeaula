@@ -7,16 +7,16 @@ namespace ByteBank.Common
         private readonly string nomeArquivoSaida;
         private readonly DateTime dataRelatorio = DateTime.Now;
 
-        //public RelatorioDeBoleto(string nomeArquivoSaida, DateTime dataRelatorio)
-        //{
-        //    this.nomeArquivoSaida = nomeArquivoSaida;
-        //    this.dataRelatorio = dataRelatorio;
-        //}
+        public RelatorioDeBoleto(string nomeArquivoSaida, DateTime dataRelatorio)
+        {
+            this.nomeArquivoSaida = nomeArquivoSaida;
+            this.dataRelatorio = dataRelatorio;
+        }
 
-        //public RelatorioDeBoleto(DateTime dataRelatorio)
-        //{
-        //    this.dataRelatorio = dataRelatorio;
-        //}
+        public RelatorioDeBoleto(DateTime dataRelatorio)
+        {
+            this.dataRelatorio = dataRelatorio;
+        }
 
         public RelatorioDeBoleto(string nomeArquivoSaida)
         {
