@@ -2,6 +2,6 @@
 {
     public interface IRelatorioDeBoleto<T>
     {
-        void SalvarBoletosPorCedente(List<T> boletos);
+        void Processar(List<T> boletos);
     }
 }

@@ -82,5 +82,5 @@ static void GravarGrupoBoletos()
     List<Boleto> boletos = leitorDeCSV.ReadCsv("Boletos.csv");
 
     RelatorioDeBoleto gravadorDeCSV = new RelatorioDeBoleto("BoletosPorCedente.csv");
-    gravadorDeCSV.SalvarBoletosPorCedente(boletos);
+    gravadorDeCSV.Processar(boletos);
 }

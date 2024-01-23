@@ -86,7 +86,7 @@ static void GravarGrupoBoletos()
     LeitorDeBoleto<Boleto> leitorDeCSV = new LeitorDeBoleto<Boleto>();
     List<Boleto> boletos = leitorDeCSV.ReadCsv("Boletos.csv");
     RelatorioDeBoleto gravadorDeCSV = new RelatorioDeBoleto();
-    gravadorDeCSV.SalvarBoletosPorCedente(boletos);
+    gravadorDeCSV.Processar(boletos);
 }
 
 static void ExecutarPlugins()
@@ -111,7 +111,7 @@ static void ExecutarPlugins()
         if (instancia is IRelatorioDeBoleto<Boleto> relatorio)
         {
             // Chamar o método SalvarBoletosPorCedente usando Reflection
-            MethodInfo metodoSalvar = classe.GetMethod("SalvarBoletosPorCedente");
+            MethodInfo metodoSalvar = classe.GetMethod("Processar");
             metodoSalvar.Invoke(relatorio, new object[] { boletos });
 
             Console.WriteLine($"Método SalvarBoletosPorCedente chamado para o tipo {classe.FullName}");
