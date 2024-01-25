@@ -123,7 +123,10 @@ static List<Type> ObterClassesDePlugin<T>()
 
     // Carregar o assembly
     //Assembly assembly = Assembly.GetExecutingAssembly();
+    //Assembly assembly = Assembly.GetAssembly();
     Assembly assembly = typeof(Boleto).Assembly;
+
+    var types = assembly.GetTypes();
 
     // Encontrar tipos que implementam a interface T
     IEnumerable<Type> tiposImplementandoT = assembly.GetTypes()
