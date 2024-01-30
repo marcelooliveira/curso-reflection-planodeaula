@@ -57,13 +57,4 @@ static void ExecutarEscolha(int escolha)
 static void LerArquivoBoletos()
 {
     Console.WriteLine("Lendo arquivo de boletos...");
-
-    LeitorDeBoleto<Boleto> leitorDeCSV = new LeitorDeBoleto<Boleto>();
-    List<Boleto> boletos = leitorDeCSV.ReadCsv("Boletos.csv");
-
-    // Agora você pode usar a lista de boletos conforme necessário.
-    foreach (var boleto in boletos)
-    {
-        Console.WriteLine($"Cedente: {boleto.CedenteNome}, Valor: {boleto.Valor}, Vencimento: {boleto.DataVencimento}");
-    }
 }
