@@ -1,59 +1,71 @@
-﻿using System.Globalization;
+﻿using System.Drawing;
 using System.Reflection;
 
 namespace ByteBank.Common
 {
-    public class LeitorDeBoleto<Boleto>
+    public class LeitorDeBoleto
     {
-        public List<Boleto> ReadCsv(string filePath)
+        public List<Boleto> LerBoletos(string caminhoArquivo)
         {
-            try
-            {
-                List<Boleto> records = new List<Boleto>();
+            var boletos = new List<Boleto>();
 
-                using (var reader = new StreamReader(filePath))
+            using (var reader = new StreamReader(caminhoArquivo))
+            {
+                string linha = reader.ReadLine();
+                string[] cabecalho = linha.Split(',');
+
+                while (!reader.EndOfStream)
                 {
-                    string[] header = reader.ReadLine()?.Split(',');
+                    linha = reader.ReadLine();
+                    string[] dados = linha.Split(',');
 
-                    while (!reader.EndOfStream)
-                    {
-                        string[] data = reader.ReadLine()?.Split(',');
-
-                        if (data != null && header != null && data.Length == header.Length)
-                        {
-                            Boleto record = MapToType(data, header);
-                            records.Add(record);
-                        }
-                    }
+                    Boleto boleto = MapearTextoParaBoleto(cabecalho, dados);
+                    //Boleto boleto = MapearTextoParaObjeto(typeof(Boleto), cabecalho, dados);
+                    //Boleto boleto = MapearTextoParaObjeto<Boleto>(typeof(Boleto), cabecalho, dados);
+                    boletos.Add(boleto);
                 }
+            }
 
-                return records;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao ler o arquivo CSV: {ex.Message}");
-                return new List<Boleto>();
-            }
+            return boletos;
         }
 
-        private Boleto MapToType(string[] data, string[] header)
+        //private Boleto MapearTextoParaObjeto(Type type, string[] nomesPropriedades, string[] valoresPropriedades)
+        ////private Boleto MapearTextoParaObjeto<T>(string[] nomesPropriedades, string[] valoresPropriedades)
+        //{
+        //    Boleto instancia = Activator.CreateInstance<Boleto>();
+
+        //    for (int i = 0; i < nomesPropriedades.Length; i++)
+        //    {
+        //        PropertyInfo property = type.GetProperty(nomesPropriedades[i]);
+
+        //        if (property != null)
+        //        {
+        //            Type propertyType = property.PropertyType;
+        //            object convertedValue = Convert.ChangeType(valoresPropriedades[i], propertyType);
+        //            property.SetValue(instancia, convertedValue);
+        //        }
+        //    }
+
+        //    return instancia;
+        //}
+
+        private Boleto MapearTextoParaBoleto(string[] nomesPropriedades, string[] valoresPropriedades)
         {
-            Type type = typeof(Boleto);
-            Boleto instance = Activator.CreateInstance<Boleto>();
-
-            for (int i = 0; i < header.Length; i++)
-            {
-                PropertyInfo property = type.GetProperty(header[i]);
-
-                if (property != null)
-                {
-                    Type propertyType = property.PropertyType;
-                    object convertedValue = Convert.ChangeType(data[i], propertyType, CultureInfo.InvariantCulture);
-                    property.SetValue(instance, convertedValue);
-                }
-            }
-
-            return instance;
+            Boleto instancia = new Boleto();
+            instancia.CedenteNome = valoresPropriedades[0];
+            instancia.CedenteCpfCnpj = valoresPropriedades[1];
+            instancia.CedenteAgencia = valoresPropriedades[2];
+            instancia.CedenteConta = valoresPropriedades[3];
+            instancia.SacadoNome = valoresPropriedades[4];
+            instancia.SacadoCpfCnpj = valoresPropriedades[5];
+            instancia.SacadoEndereco = valoresPropriedades[6];
+            instancia.Valor = Convert.ToDecimal(valoresPropriedades[7]);
+            instancia.DataVencimento = Convert.ToDateTime(valoresPropriedades[8]);
+            instancia.NumeroDocumento = valoresPropriedades[9];
+            instancia.NossoNumero = valoresPropriedades[10];
+            instancia.CodigoBarras = valoresPropriedades[11];
+            instancia.LinhaDigitavel = valoresPropriedades[12];
+            return instancia;
         }
     }
 }
