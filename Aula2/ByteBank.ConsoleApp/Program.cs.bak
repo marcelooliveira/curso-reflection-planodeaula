@@ -69,7 +69,7 @@ static void LerArquivoBoletos()
     // Agora você pode usar a lista de boletos conforme necessário.
     foreach (var boleto in boletos)
     {
-        Console.WriteLine($"Cedente: {boleto.CedenteNome}, Valor: {boleto.Valor:#0.00}, Vencimento: {boleto.DataVencimento}");
+        Console.WriteLine($"Cedente: {boleto.CedenteNome}, Valor: {boleto.Valor}, Vencimento: {boleto.DataVencimento}");
     }
 }
 

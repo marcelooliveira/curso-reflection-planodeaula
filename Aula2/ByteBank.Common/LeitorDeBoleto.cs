@@ -5,55 +5,67 @@ namespace ByteBank.Common
 {
     public class LeitorDeBoleto<Boleto>
     {
-        public List<Boleto> ReadCsv(string filePath)
+        public List<Boleto> LerBoletos(string caminhoArquivo)
         {
-            try
-            {
-                List<Boleto> records = new List<Boleto>();
+            // montar lista de boletos
+            var boletos = new List<Boleto>();
 
-                using (var reader = new StreamReader(filePath))
+            // ler arquivo de boletos
+            using (var reader = new StreamReader(caminhoArquivo))
+            {
+                // ler cabeçalho do arquivo CSV
+                string linha = reader.ReadLine();
+                string[] cabecalho = linha.Split(',');
+
+                // para cada linha do arquivo CSV
+                while (!reader.EndOfStream)
                 {
-                    string[] header = reader.ReadLine()?.Split(',');
+                    // ler dados
+                    linha = reader.ReadLine();
+                    string[] dados = linha.Split(',');
 
-                    while (!reader.EndOfStream)
-                    {
-                        string[] data = reader.ReadLine()?.Split(',');
+                    // carregar objeto Boleto
+                    Boleto boleto = MapearTextoParaObjeto<Boleto>(cabecalho, dados);
 
-                        if (data != null && header != null && data.Length == header.Length)
-                        {
-                            Boleto record = MapToType(data, header);
-                            records.Add(record);
-                        }
-                    }
+                    // adicionar boleto à lista
+                    boletos.Add(boleto);
                 }
+            }
 
-                return records;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao ler o arquivo CSV: {ex.Message}");
-                return new List<Boleto>();
-            }
+            // retornar lista de boletos
+            return boletos;
         }
 
-        private Boleto MapToType(string[] data, string[] header)
+        private T MapearTextoParaObjeto<T>(string[] nomesPropriedades, string[] valoresPropriedades)
         {
-            Type type = typeof(Boleto);
-            Boleto instance = Activator.CreateInstance<Boleto>();
+            T instancia = Activator.CreateInstance<T>();
 
-            for (int i = 0; i < header.Length; i++)
+            // Percorre os nomes de propriedades.
+
+            for (int i = 0; i < nomesPropriedades.Length; i++)
             {
-                PropertyInfo property = type.GetProperty(header[i]);
+                // Obtém a propriedade atual através do nome.
+                string nomePropriedade = nomesPropriedades[i];
+                PropertyInfo propertyInfo = instancia.GetType().GetProperty(nomePropriedade);
 
-                if (property != null)
+                // Verifica se a propriedade foi encontrada.
+                if (propertyInfo != null)
                 {
-                    Type propertyType = property.PropertyType;
-                    object convertedValue = Convert.ChangeType(data[i], propertyType, CultureInfo.InvariantCulture);
-                    property.SetValue(instance, convertedValue);
+                    // Obtém o tipo da propriedade.
+                    Type propertyType = propertyInfo.PropertyType;
+
+                    // Obtém o valor da propriedade.
+                    string valor = valoresPropriedades[i];
+
+                    // Converte o valor da propriedade para o tipo correto.
+                    object valorConvertido = Convert.ChangeType(valor, propertyType);
+
+                    // Guarda o valor convertido na propriedade.
+                    propertyInfo.SetValue(instancia, valorConvertido);
                 }
             }
 
-            return instance;
+            return instancia;
         }
     }
 }
